@@ -21,27 +21,27 @@ We only support single-gpu training and single-gpu testing
 
 ### Prepare COCO dataset
 
-'''shell
+```shell
 ln -s $path/to/coco data/coco
-'''
+```
 
 ### single-gpu training
 
-'''shell
+```shell
 python tools/train.py configs/siamese_mask_rcnn.py
-'''
+```
 
 ### single-gpu testing
 
-'''shell
+```shell
 python tools/test.py configs/siamese_mask_rcnn.py work_dirs/siamese_mask_rcnn_train/latest.pth --out results.pkl --eval bbox segm
-'''
+```
 
 ### show the result
 
-'''shell
+```shell
 python tools/test.py configs/siamese_mask_rcnn.py work_dirs/siamese_mask_rcnn_train/latest.pth --show
-'''
+```
 
 ## Citation
 
