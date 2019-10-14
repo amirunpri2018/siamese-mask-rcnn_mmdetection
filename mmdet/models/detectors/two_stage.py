@@ -88,11 +88,11 @@ class TwoStageDetector(BaseDetector, RPNTestMixin, BBoxTestMixin,
         for i in range(len(Rf)):
             rf_avg = self.avg(Rf[i])
             delta = If[i] - rf_avg
-            conca = torch.cat((If[i], delta.abs()), dim=1)
-            out.append(self.conv(conca))
+            concat = torch.cat((If[i], delta.abs()), dim=1)
+            out.append(self.conv(concat))
         return out
 
-    # 将输入的img变为tuple(query_img,reference_img)
+    # extract_feat in siamese way
     def extract_feat(self, img, img_meta):
         If = self.backbone(img)
         if self.with_neck:

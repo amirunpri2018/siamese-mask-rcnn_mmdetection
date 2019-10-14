@@ -29,19 +29,16 @@ class CocoDataset(CustomDataset):
     def load_annotations(self, ann_file, test_mode=False):
         self.coco = COCO(ann_file)
         catids = self.coco.getCatIds()
-        # cats = self.coco.loadCats(self.coco.getCatIds())
-        # nms = [cat['name'] for cat in cats]
+
+        # filter test and tarin categories, 0 for train, 1 for test
         self.cats = []
-        for i in range(2):
+        for _ in range(2):
             self.cats.append([])
         for i in range(len(catids)):
             if (i + 1) % 4 == 0:
                 self.cats[1].append(catids[i])
             else:
                 self.cats[0].append(catids[i])
-        # cat = np.random.choice(self.S1)
-        # catIds = self.coco.getCatIds(catNms=[cat]);
-        # imgIds = self.coco.getImgIds(catIds=catIds);
 
         self.cat_ids = self.coco.getCatIds()
         self.cat2label = {
@@ -49,6 +46,8 @@ class CocoDataset(CustomDataset):
             for i, cat_id in enumerate(self.cat_ids)
         }
         self.img_ids = self.coco.getImgIds()
+
+        # split the dataset with correct categories in different mode
         img_infos = []
         for i in self.img_ids:
             if test_mode:
@@ -79,12 +78,14 @@ class CocoDataset(CustomDataset):
                         break
                 if cat_flag:
                     img_infos.append(info)
-        return img_infos[-500:]
+        return img_infos
 
     def get_ann_info(self, idx):
         img_id = self.img_infos[idx]['id']
         ann_ids = self.coco.getAnnIds(imgIds=[img_id])
         ann_info = self.coco.loadAnns(ann_ids)
+
+        # different process in different mode
         if not self.test_mode:
             return self._parse_ann_info(ann_info, img_id, self.with_mask)
         else:
@@ -114,6 +115,8 @@ class CocoDataset(CustomDataset):
         gt_bboxes_ignore = []
         cat_ann_ids = self.coco.getAnnIds(catIds=[category_id])
         rf_ann = dict()
+
+        # choose a cate randomly
         while True:
             tmp_id = np.random.randint(0, len(cat_ann_ids))
             if cat_ann_ids[tmp_id] in img_ann_ids:
@@ -122,6 +125,7 @@ class CocoDataset(CustomDataset):
                 ann = self.coco.loadAnns([cat_ann_ids[tmp_id]])[0]
                 rf_ann = ann
                 break
+
         rf_img_file = self.coco.loadImgs(rf_ann['image_id'])[0]['file_name']
         rf_img = mmcv.imread(osp.join(self.img_prefix, rf_img_file))
         cls_name = self.CLASSES[self.cat2label[ann['category_id']] - 1]
@@ -143,7 +147,6 @@ class CocoDataset(CustomDataset):
             elif ann['category_id'] == category_id:
                 gt_bboxes.append(bbox)
                 gt_labels.append(self.cat2label[ann['category_id']])
-                # gt_labels.append(1)
             else:
                 continue
             if with_mask:
@@ -198,6 +201,7 @@ class CocoDataset(CustomDataset):
         # 2. polys: each mask consists of one or several polys, each poly is a
         # list of float.
 
+        # choose category in train split
         i = 0
         index = np.random.randint(len(ann_info))
         cat = ann_info[index]['category_id']
@@ -235,7 +239,6 @@ class CocoDataset(CustomDataset):
                 gt_bboxes_ignore.append(bbox)
             elif ann['category_id'] == cat:
                 gt_bboxes.append(bbox)
-                # gt_labels.append(self.cat2label[ann['category_id']])
                 gt_labels.append(1)
             else:
                 continue

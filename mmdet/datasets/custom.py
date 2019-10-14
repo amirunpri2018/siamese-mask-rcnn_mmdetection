@@ -223,6 +223,7 @@ class CustomDataset(Dataset):
         img_scale = random_scale(self.img_scales, self.multiscale_mode)
         img, img_shape, pad_shape, scale_factor = self.img_transform(
             img, img_scale, flip, keep_ratio=self.resize_keep_ratio)
+        # process rf_img, resize to (192, 192)
         rf_img, _, _, _ = self.img_transform(rf_img, (192, 192))
         rf_img = zero_pad(rf_img)
         img = img.copy()
@@ -257,6 +258,7 @@ class CustomDataset(Dataset):
             pad_shape=pad_shape,
             scale_factor=scale_factor,
             flip=flip)
+        # Todo process rf_img in GPU
         data = dict(
             img=DC(to_tensor(img), stack=True),
             img_meta=DC(img_meta, cpu_only=True),
@@ -314,7 +316,7 @@ class CustomDataset(Dataset):
                 rf_img = zero_pad(rf_img)
                 _img_meta['rf_img'] = rf_img
             if cat is not None:
-                # import ipdb;ipdb.set_trace()
+                # get category and img_id for test
                 _img_meta['label'] = cat[0]
                 _img_meta['img_id'] = img_id
             return _img, _img_meta, _proposal

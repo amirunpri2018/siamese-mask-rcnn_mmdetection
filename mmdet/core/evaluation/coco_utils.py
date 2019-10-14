@@ -28,23 +28,23 @@ def coco_eval(result_files, result_types, coco, img_ids_=None, cat_ids_=None, ma
         coco_dets = coco.loadRes(result_file)
         iou_type = 'bbox' if res_type == 'proposal' else res_type
         cocoEval = COCOeval(coco, coco_dets, iou_type)
-        # import ipdb;ipdb.set_trace()
         cat_ids_all = coco.getCatIds()
         label2cat = {
             i + 1: cat_id
             for i, cat_id in enumerate(cat_ids_all)
         }
+        # only evaluate the category in split
         img_ids = np.unique(np.array(img_ids_)).tolist()
         cat_ids = np.unique(np.array(cat_ids_)).tolist()
         for i in range(len(cat_ids)):
             cat_ids[i] = label2cat[cat_ids[i]]
         cocoEval.params.imgIds = img_ids
         cocoEval.params.catIds = cat_ids
-        # import ipdb; ipdb.set_trace()
+
+        # coco vis
         # import matplotlib.pyplot as plt
         # import skimage.io as io
         # for i in range(0, len(img_ids)):
-        #     i = 0
         #     img = coco.loadImgs(img_ids[i])[0]
         #     print(img_ids[i])
         #     img = io.imread(img['coco_url'])
@@ -54,7 +54,6 @@ def coco_eval(result_files, result_types, coco, img_ids_=None, cat_ids_=None, ma
         #     anns = coco_dets.loadAnns(annIds)
         #     coco.showAnns(anns)
         #     plt.show()
-        #     import ipdb;ipdb.set_trace()
 
         if res_type == 'proposal':
             cocoEval.params.useCats = 0
