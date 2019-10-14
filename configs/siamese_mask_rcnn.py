@@ -176,8 +176,7 @@ evaluation = dict(interval=1)
 total_epochs = 12
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/siamese_mask_rcnn_train_12_v2'
-# work_dir = './work_dirs/debug'
+work_dir = './work_dirs/siamese_mask_rcnn'
 load_from = None
 resume_from = None
 workflow = [('train', 1)]
