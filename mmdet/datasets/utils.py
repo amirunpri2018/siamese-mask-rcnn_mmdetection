@@ -5,6 +5,8 @@ import mmcv
 import numpy as np
 import torch
 
+import cv2
+
 
 def prepare_rf(img, ann, cat):
     while True:
@@ -21,17 +23,22 @@ def prepare_rf_test(img, ann, cls_name):
     x, y, w, h = np.array(ann['bbox']).astype(int)
     crop = img[y:y + h + 1, x:x + w + 1, :]
     # vis rf_img
-    # import matplotlib.pyplot as plt
-    # plt.imshow(crop)
-    # plt.text(-1, -1, '{}'.format(cls_name), fontsize=30)
-    # plt.show()
+    b, g, r = cv2.split(crop)
+    show_img = cv2.merge([r, g, b])
+    import matplotlib.pyplot as plt
+    plt.imshow(show_img)
+    plt.text(-1, -1, '{}'.format(cls_name), fontsize=30)
+    plt.show()
     return crop
 
 
 def zero_pad(img):
     _, h, w = img.shape
     max_ = np.max(img.shape)
-    pad = np.pad(img,((0, 0), (0, max_-h), (0, max_-w)) , 'constant', constant_values=(0, 0))
+    pad = np.pad(
+        img, ((0, 0), (0, max_ - h), (0, max_ - w)),
+        'constant',
+        constant_values=(0, 0))
     return pad
 
 
